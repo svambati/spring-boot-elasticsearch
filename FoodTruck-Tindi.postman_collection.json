@@ -1,0 +1,115 @@
+{
+	"info": {
+		"_postman_id": "77c9a4cf-974a-4a1c-b7bc-d965f75606fc",
+		"name": "FoodTruck-Tindi",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "localhost:8080/foodTrucks/1",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8080/foodTrucks/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"foodTrucks",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Request",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "666ec035-bb8c-4dc3-a393-4367f224d9b8",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\":\"1\",\n    \"productName\": \"The Big Cheese\",\n    \"location\":{\n        \"address\": \"10701 strawflower dr\",\n        \"city\": \"Austin\",\n        \"state\": \"TX\" \n    },\n    \"categoryParentType\": \"starters\",\n    \"categoryCodeType\": \"salads\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/foodTrucks",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"foodTrucks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Inserting records to elastic search",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6b155ffe-3ac3-4c87-83ba-1df0d7a8c33a",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\":\"2\",\n    \"productName\": \"The Burgers\",\n    \"location\":{\n        \"address\": \"11305 4 Points Dr\",\n        \"city\": \"Austin\",\n        \"state\": \"TX\" \n    },\n    \"categoryParentType\": \"starters\",\n    \"categoryCodeType\": \"salads\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/foodTrucks/2",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"foodTrucks",
+						"2"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
