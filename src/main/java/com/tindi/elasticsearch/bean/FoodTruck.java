@@ -7,11 +7,9 @@ import lombok.Data;
 @Data
 public class FoodTruck
 {
-
     private String id;
     private String productName;
     private Location location;
     private String categoryParentType;
     private String CategoryCodeType;
-
 }
