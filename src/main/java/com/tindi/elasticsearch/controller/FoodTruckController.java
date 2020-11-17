@@ -36,7 +36,7 @@ public class FoodTruckController {
         this.elasticSearchClient = elasticSearchClient;
     }
 
-    @PostMapping
+    @PostMapping("/{id}")
     public String insertFoodTruck(@RequestBody FoodTruck foodTruck) throws Exception {
         return elasticSearchClient.addDoc(indexName, foodTruck.getId(), foodTruck).toString();
     }
@@ -69,6 +69,8 @@ public class FoodTruckController {
 
         return this.getResults(searchResponse);
     }
+
+    @PostMapping(value = "/create/index")
 
     private com.tindi.elasticsearch.controller.SearchResponse getResults(SearchResponse searchResponse) {
 
