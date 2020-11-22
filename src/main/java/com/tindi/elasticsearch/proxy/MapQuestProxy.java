@@ -1,6 +1,7 @@
 package com.tindi.elasticsearch.proxy;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.tindi.elasticsearch.bean.Address;
 import com.tindi.elasticsearch.bean.Location;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -25,17 +26,18 @@ public class MapQuestProxy {
     }
 
 
-    public Location getGeoCoordinates(Location location) {
-        if (location.getAddress() == null || location.getAddress().isEmpty())
+    public Location getGeoCoordinates(Address address1) {
+        Location location = null;
+        if (address1.getAddress() == null || address1.getAddress().isEmpty())
             return null;
         try {
-            String address = new StringBuffer(location.getAddress())
+            String address = new StringBuffer(address1.getAddress())
                     .append(", ")
-                    .append(location.getCity())
+                    .append(address1.getCity())
                     .append(" ")
-                    .append(location.getState())
+                    .append(address1.getState())
                     .append(" ")
-                    .append(location.getZipCode() != null ? location.getZipCode() : "")
+                    .append(address1.getZipCode() != null ? address1.getZipCode() : "")
                     .toString().trim();
 
             String url = mapQuestUrlByLocation + address;
@@ -46,9 +48,9 @@ public class MapQuestProxy {
             if (response.getStatusCode().is2xxSuccessful() && null != responseBody) {
                 System.out.println(responseBody.path("results").get(0).path("locations"));
                 System.out.println(responseBody.path("results").get(0).path("locations").get(0));
-
-                location.setLatitude(responseBody.path("results").get(0).path("locations").get(0).path("latLng").path("lat").asDouble());
-                location.setLongitude(responseBody.path("results").get(0).path("locations").get(0).path("latLng").path("lng").asDouble());
+                double lat = responseBody.path("results").get(0).path("locations").get(0).path("latLng").path("lat").asDouble();
+                double lon = responseBody.path("results").get(0).path("locations").get(0).path("latLng").path("lng").asDouble();
+                location = new Location(lat, lon);
             }
             return location;
         } catch (HttpStatusCodeException e) {

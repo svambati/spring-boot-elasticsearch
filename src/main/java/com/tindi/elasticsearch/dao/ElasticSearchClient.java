@@ -1,6 +1,7 @@
 package com.tindi.elasticsearch.dao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tindi.elasticsearch.bean.Address;
 import com.tindi.elasticsearch.bean.FoodTruck;
 import com.tindi.elasticsearch.bean.FoodTrucks;
 import com.tindi.elasticsearch.bean.Location;
@@ -41,6 +42,14 @@ public class ElasticSearchClient {
 
     private final String INDEX = "food_trucks_data";
     private final String TYPE = "foodTrucks";
+    private final String MAPPING = "{\n" +
+            "  \"properties\": {\n" +
+            "    \"location\": {\n" +
+            "      \"type\": \"geo_point\"\n" +
+            "    }\n" +
+            "  }\n" +
+            "}";
+    private final String SETTING = "";
 
     @Autowired
     private RestHighLevelClient restHighLevelClient;
@@ -61,16 +70,17 @@ public class ElasticSearchClient {
         return builder.build();
     }
 
-    public CreateIndexResponse createIndex(String indexName, String settings, String mapping) throws IOException {
-        CreateIndexRequest request = new CreateIndexRequest(indexName);
-        if (null != settings && !"".equals(settings)) {
-            request.settings(settings, XContentType.JSON);
+    public CreateIndexResponse createIndex() throws IOException {
+        CreateIndexRequest request = new CreateIndexRequest(INDEX);
+        if (null != SETTING && !"".equals(SETTING)) {
+            request.settings(SETTING, XContentType.JSON);
         }
-        if (null != mapping && !"".equals(mapping)) {
-            request.mapping(mapping, XContentType.JSON);
+        if (null != MAPPING && !"".equals(MAPPING)) {
+            request.mapping(MAPPING, XContentType.JSON);
         }
         return this.restHighLevelClient.indices().create(request, RequestOptions.DEFAULT);
     }
+
 
 
     public AcknowledgedResponse deleteIndex(String... indexNames) throws IOException {
@@ -84,7 +94,7 @@ public class ElasticSearchClient {
     }
 
     public IndexResponse addDoc(String indexName, String id, FoodTruck foodTruck) throws IOException {
-        Location location = this.getGeoCoordinates(foodTruck.getLocation());
+        Location location = this.getGeoCoordinates(foodTruck.getAddress());
 
         foodTruck.setLocation(location);
         IndexRequest request = new IndexRequest(indexName);
@@ -179,8 +189,8 @@ public class ElasticSearchClient {
         return this.restHighLevelClient.search(request, RequestOptions.DEFAULT);
     }
 
-    private Location getGeoCoordinates(Location location) {
+    private Location getGeoCoordinates(Address address) {
 
-        return mapQuestProxy.getGeoCoordinates(location);
+        return mapQuestProxy.getGeoCoordinates(address);
     }
 }
