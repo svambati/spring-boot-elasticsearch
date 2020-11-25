@@ -1,12 +1,12 @@
 package com.tindi.elasticsearch.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties
 @Data
+@NoArgsConstructor
 public class FoodTruck
 {
     private String id;

@@ -6,6 +6,7 @@ import com.tindi.elasticsearch.bean.FoodTrucks;
 import com.tindi.elasticsearch.dao.ElasticSearchClient;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.index.get.GetResult;
 import org.elasticsearch.search.SearchHit;
 import org.springframework.http.HttpStatus;
@@ -71,6 +72,14 @@ public class FoodTruckController {
     }
 
     @PostMapping(value = "/create/index")
+    public boolean createFoodTruckIndex(){
+        try {
+            CreateIndexResponse createIndexResponse = elasticSearchClient.createIndex();
+            return createIndexResponse.isAcknowledged();
+        } catch (IOException e) {
+            return false;
+        }
+    }
 
     private com.tindi.elasticsearch.controller.SearchResponse getResults(SearchResponse searchResponse) {
 
