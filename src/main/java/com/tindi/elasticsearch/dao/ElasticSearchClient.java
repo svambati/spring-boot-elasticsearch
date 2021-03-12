@@ -23,11 +23,13 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.GeoDistanceSortBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -136,27 +138,37 @@ public class ElasticSearchClient {
         return this.restHighLevelClient.search(request, RequestOptions.DEFAULT);
     }
 
-    public SearchResponse termSearch(String field, String key, int page, int size, String... indexNames) throws IOException {
+    public SearchResponse termSearch(String term,
+                                     int page,
+                                     int size,
+                                     double cust_lat,
+                                     double radius,
+                                     double cust_long,
+                                     String... indexNames) throws IOException {
         SearchRequest request = new SearchRequest(indexNames);
         SearchSourceBuilder builder = new SearchSourceBuilder();
-        builder.query(QueryBuilders.termsQuery(field, key))
-               .from(page)
-               .size(size);
-        request.source(builder);
+        QueryBuilder matchQuery = QueryBuilders.queryStringQuery(term);
+        QueryBuilder query = QueryBuilders.boolQuery().must(QueryBuilders.queryStringQuery("*" + term + "*")
+                                                                         .field("productName")
+                                                                         .field("categoryParentType")
+                                                                         .field("categoryCodeType"));
+
+        GeoPoint geoPoint = new GeoPoint(cust_lat, cust_long);
+
+//        GeoDistanceQueryBuilder geoDistanceQueryBuilder = QueryBuilders.geoDistanceQuery("location").point(geoPoint).distance(radius, DistanceUnit.MILES);
+
+        QueryBuilder query1 = QueryBuilders.matchAllQuery();
+
+
+        QueryBuilder finalQuery = QueryBuilders.boolQuery().must(query);
+        builder.query(finalQuery);
+        //.postFilter(geoDistanceQueryBuilder);
+        builder.sort(new GeoDistanceSortBuilder("location", geoPoint));
+        request.source(builder.size(10));
+
         return this.restHighLevelClient.search(request, RequestOptions.DEFAULT);
     }
 
-    public SearchResponse multiFieldSearch(String indexName, String term) throws IOException {
-        QueryBuilder matchQueryBuilder = QueryBuilders.multiMatchQuery(term, "productName", "categoryParentType", "CategoryCodeType");
-
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.query(matchQueryBuilder);
-        SearchRequest searchRequest = new SearchRequest(indexName);
-        searchRequest.source(searchSourceBuilder);
-
-        return this.restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-
-    }
 
     public BulkResponse importAll(String indexName, boolean isAutoId, FoodTrucks foodTrucks) throws IOException {
         if (foodTrucks.getFoodTrucks().size() == 0) {

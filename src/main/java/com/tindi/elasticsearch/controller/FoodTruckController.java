@@ -63,16 +63,18 @@ public class FoodTruckController {
         return elasticSearchClient.deleteDoc(indexName, id).toString();
     }
 
-    @RequestMapping(value = "/search/{queryTerm}", method = RequestMethod.GET)
-    public com.tindi.elasticsearch.controller.SearchResponse searchFoodTruckTermSearch(@PathVariable String queryTerm) throws IOException {
+    @RequestMapping(value = "/search/{queryTerm}/{cust_lat}/{cust_long}", method = RequestMethod.GET)
+    public com.tindi.elasticsearch.controller.SearchResponse searchFoodTruckTermSearch(@PathVariable String queryTerm,
+                                                                                       @PathVariable double cust_long,
+                                                                                       @PathVariable double cust_lat) throws IOException {
 
-        SearchResponse searchResponse = elasticSearchClient.multiFieldSearch(indexName, queryTerm);
+        SearchResponse searchResponse = elasticSearchClient.termSearch(queryTerm, 1, 20, cust_lat, 10, cust_long, indexName);
 
         return this.getResults(searchResponse);
     }
 
     @PostMapping(value = "/create/index")
-    public boolean createFoodTruckIndex(){
+    public boolean createFoodTruckIndex() {
         try {
             CreateIndexResponse createIndexResponse = elasticSearchClient.createIndex();
             return createIndexResponse.isAcknowledged();
